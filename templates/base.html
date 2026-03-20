@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Disaster Alert & Management System{% endblock %}</title>
+    <style>
+        #debug-console {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.8);
+            color: lime;
+            font-family: monospace;
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+    <li><a href="/safe-routes"><i class="fas fa-route"></i> Safe Routes</a></li>
+    <script>
+        window.onerror = function (msg, url, line) {
+            // Silence cross-origin script errors and null messages
+            const message = String(msg || "").toLowerCase();
+            if (message.includes("script error") || !msg || msg === "null") {
+                console.log("Silenced benign error:", msg);
+                return true;
+            }
+
+            var consoleEl = document.getElementById('debug-console');
+            if (!consoleEl) {
+                consoleEl = document.createElement('div');
+                consoleEl.id = 'debug-console';
+                document.body.appendChild(consoleEl);
+            }
+
+            // Add a close button if it's the first error
+            if (!consoleEl.innerHTML) {
+                consoleEl.innerHTML = '<div style="display: flex; justify-content: space-between; border-bottom: 1px solid lime; margin-bottom: 5px; padding-bottom: 5px;"><span>SYSTEM DEBUG CONSOLE</span><button onclick="this.parentElement.parentElement.style.display=\'none\'" style="background: transparent; color: lime; border: 1px solid lime; cursor: pointer; padding: 0 5px;">[X] Close</button></div>';
+            }
+
+            consoleEl.innerHTML += '<div>Error: ' + msg + ' at ' + url + ':' + line + '</div>';
+            consoleEl.style.display = 'block';
+            return false;
+        };
+    </script>
+
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        crossorigin="anonymous" />
+    <link rel="stylesheet"
+href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />    
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"
+        crossorigin="anonymous">
+
+    {% block style_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_v2.css') }}">
+    {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-exclamation-triangle brand-icon"></i>
+                <span>VillageFloodAlert</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+                <li><a href="/dashboard"
+                        class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="/map" class="nav-link {% if request.endpoint == 'map_view' %}active{% endif %}">Map</a>
+                </li>
+                <li><a href="/first-aid"
+                        class="nav-link {% if request.endpoint == 'first_aid' %}active{% endif %}">First Aid</a></li>
+                <li><a href="/chat" class="nav-link {% if request.endpoint == 'chat' %}active{% endif %}">AI
+                        Assistant</a></li>
+                <li><a href="/emergency-contacts"
+                        class="nav-link {% if request.endpoint == 'emergency_contacts' %}active{% endif %}">Emergency</a>
+                </li>
+                <li><a href="/about" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a>
+                </li>
+            </ul>
+
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Notification Banner -->
+    <!-- Alert Notification Banner Removed by User Request -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Village Flood Alert System</h4>
+                <p>Real-time water level monitoring and management for village safety</p>
+            </div>
+            <div class="footer-section">
+                <h4>Emergency Contacts</h4>
+                <p>Police: 100 | Ambulance: 102 | Fire: 101</p>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Village Flood Alert & Management System. All rights reserved. | Developed for Community
+                Safety</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <!-- Main Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Global functions
+        // Global functions
+        function closeAlertBanner() {
+            // Document element removed
+        }
+
+        function showAlert(title, message, type = 'info') {
+            // Alert logic disabled by user request
+            console.log("Alert suppressed:", title, message);
+        }
+
+        // Fetch alerts logic disabled
+        // setInterval(fetchAlerts, 30000);
+
+        function fetchAlerts() {
+            // Disabled
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>

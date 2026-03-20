@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}About | DisasterAlert{% endblock %}
+
+{% block content %}
+<div class="redesign-container">
+    <!-- Header -->
+    <header class="redesign-header">
+        <i class="fas fa-info-circle"></i>
+        <h1>About Village Flood Alert</h1>
+        <p>Building community safety through modern technology and preparedness</p>
+    </header>
+
+    <!-- Grid Layout -->
+    <div class="redesign-grid">
+        <!-- Main Column (Left) -->
+        <main class="redesign-main">
+            <section class="clean-card">
+                <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <p>
+                    Village Flood Alert is a specialized community disaster management platform designed to protect our
+                    area
+                    through real-time monitoring and instant response. We aim to bridge the gap between hazard detection
+                    and emergency mobilization.
+                </p>
+            </section>
+
+            <section class="clean-card">
+                <h2><i class="fas fa-layer-group"></i> Key Features</h2>
+                <p>Our platform integrates multiple critical systems into one cohesive safety network:</p>
+                <ul>
+                    <li><strong>Real-Time Monitoring:</strong> Integration with weather and seismic APIs for instant
+                        hazard detection.</li>
+                    <li><strong>Interactive Mapping:</strong> Visualizing safe zones, high-risk areas, and evacuation
+                        routes on-the-fly.</li>
+                    <li><strong>AI Safety Assistant:</strong> Rule-based guidance for disaster protocols and first-aid
+                        instructions.</li>
+                    <li><strong>Location-Based SOS:</strong> One-click emergency alerts that share your coordinates with
+                        responders.</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- Sidebar Column (Right) -->
+        <aside class="redesign-sidebar">
+            <div class="clean-card highlight-card">
+                <h3><i class="fas fa-shield-alt"></i> Why It Matters</h3>
+                <p>
+                    During emergencies, every second counts. Village Flood Alert reduces response times and ensures that
+                    everyone in the community has access to the right information at the right time.
+                </p>
+            </div>
+
+            <div class="clean-card">
+                <h3><i class="fas fa-code"></i> Tech Stack</h3>
+                <div class="sidebar-item-list">
+                    <div class="sidebar-action-btn"><i class="fab fa-python"></i> Flask Backend</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-database"></i> Open Weather API</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-map-marked-alt"></i> Leaflet </div>
+                    <div class="sidebar-action-btn"><i class="fas fa-robot"></i> AI Knowledge Base</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Note Footer -->
+    <footer class="about-footer"
+        style="text-align: center; margin-top: 4rem; padding: 2rem; border-top: 1px solid var(--border);">
+        <p style="font-style: italic; color: var(--text-secondary);">Developed as a comprehensive village disaster
+            management solution with a focus on real-world applicability.</p>
+    </footer>
+</div>
+{% endblock %}

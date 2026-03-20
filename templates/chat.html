@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant - Disaster Alert & Management System{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="page-header">
+        <h1><i class="fas fa-robot"></i> AI Disaster Assistant</h1>
+        <p>Ask anything about disaster safety and first aid. Get instant guidance from our intelligent assistant.</p>
+    </div>
+
+    <!-- AI Status Indicator -->
+    <div class="ai-status" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);">
+        <i class="fas fa-brain"></i> <strong>Powered by Groq AI (Llama 3.3 70B)</strong> - Ultra-fast, intelligent disaster response assistant
+    </div>
+
+    <div class="chat-wrapper">
+        <div class="chat-main">
+            <div id="chatMessages" class="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar bot-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hi! I'm DisasterAlert AI, your personal safety assistant powered by Groq's Llama 3.3 model. I can help you with:</p>
+                        <ul>
+                            <li>🌍 <strong>Earthquake Safety</strong> - Before, during, and after earthquake protocols</li>
+                            <li>💧 <strong>Flood Safety</strong> - Flood prevention and response strategies</li>
+                            <li>🔥 <strong>Fire Safety</strong> - Fire prevention and evacuation procedures</li>
+                            <li>🌪️ <strong>Cyclone Safety</strong> - Hurricane/cyclone preparedness and response</li>
+                            <li>🩹 <strong>First Aid</strong> - Bleeding, fractures, burns, CPR, and more</li>
+                            <li>📋 <strong>Emergency Preparedness</strong> - Building emergency kits and plans</li>
+                            <li>📊 <strong>Real-Time Alerts</strong> - Current village flood and weather status</li>
+                        </ul>
+                        <p style="margin-top: 10px;">I understand natural language and provide context-aware responses. Ask me complex questions like "What should I do if there's an earthquake while I'm on the 5th floor?" or "How do I help someone who's bleeding heavily?"</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <form id="chatForm" onsubmit="sendMessage(event)">
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            id="messageInput"
+                            placeholder="Ask me anything about disaster safety, first aid, or emergency preparedness..."
+                            autocomplete="off"
+                        />
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="chat-sidebar">
+            <div class="quick-questions">
+                <h3><i class="fas fa-question-circle"></i> Popular Questions</h3>
+                <button class="quick-btn" onclick="sendQuickQuestion('What to do during an earthquake?')">
+                    <i class="fas fa-wave-square"></i> Earthquake Safety
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('How to stay safe during a flood?')">
+                    <i class="fas fa-water"></i> Flood Safety
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('What should I do in case of fire?')">
+                    <i class="fas fa-fire"></i> Fire Safety
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('How to prepare for a cyclone?')">
+                    <i class="fas fa-wind"></i> Cyclone Safety
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('How to treat severe bleeding?')">
+                    <i class="fas fa-heartbeat"></i> First Aid - Bleeding
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('How to perform CPR?')">
+                    <i class="fas fa-heart-pulse"></i> CPR Instructions
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('What is the current status?')">
+                    <i class="fas fa-info-circle"></i> Current Status
+                </button>
+                <button class="quick-btn" onclick="sendQuickQuestion('Emergency preparedness steps')">
+                    <i class="fas fa-clipboard-list"></i> Preparedness
+                </button>
+            </div>
+
+            <div class="chat-info">
+                <h3><i class="fas fa-lightbulb"></i> How It Works</h3>
+                <p>This AI assistant uses Groq's ultra-fast Llama 3.3 70B model, providing intelligent, context-aware responses to your disaster safety questions. It also integrates real-time flood sensor and weather data from Ongole Village.</p>
+                <p><strong>Note:</strong> For life-threatening emergencies, call emergency services (100/102/101) immediately instead of relying on this assistant.</p>
+            </div>
+
+            <div class="chat-resources">
+                <h3><i class="fas fa-link"></i> Resources</h3>
+                <a href="/first-aid" class="resource-link">
+                    <i class="fas fa-book-medical"></i> First Aid Guides
+                </a>
+                <a href="/safe-routes" class="resource-link">
+                    <i class="fas fa-route"></i> Evacuation Routes
+                </a>
+                <a href="/dashboard" class="resource-link">
+                    <i class="fas fa-tachometer-alt"></i> Alerts Dashboard
+                </a>
+                <a href="/emergency-contacts" class="resource-link">
+                    <i class="fas fa-phone"></i> Emergency Contacts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messageInput = document.getElementById('messageInput');
+        messageInput.focus();
+        scrollToBottom();
+    });
+
+    function sendMessage(event) {
+        event.preventDefault();
+
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+
+        if (!message) return;
+
+        addMessageToChat(message, 'user');
+        messageInput.value = '';
+        showTypingIndicator();
+
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            removeTypingIndicator();
+            addMessageToChat(data.response, 'bot');
+        })
+        .catch(err => {
+            removeTypingIndicator();
+            addMessageToChat('Sorry, I encountered an error. Please try again or call emergency services at 100/102/101 for immediate help.', 'bot');
+            console.error('Chat error:', err);
+        });
+
+        messageInput.focus();
+    }
+
+    function sendQuickQuestion(question) {
+        document.getElementById('messageInput').value = question;
+        sendMessage({ preventDefault: () => {} });
+    }
+
+    function addMessageToChat(message, sender) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+
+        if (sender === 'user') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${escapeHtml(message)}</p>
+                </div>
+                <div class="message-avatar user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-avatar bot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p>${formatResponse(message)}</p>
+                </div>
+            `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function showTypingIndicator() {
+        const chatMessages = document.getElementById('chatMessages');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot-message typing-indicator';
+        typingDiv.id = 'typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="message-avatar bot-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <div class="typing">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(typingDiv);
+        scrollToBottom();
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.remove();
+    }
+
+    function formatResponse(text) {
+        text = text.replace(/\n/g, '<br>');
+        text = text.replace(/([A-Z][A-Z\s]+:)/g, '<strong>$1</strong>');
+        text = text.replace(/(\d+\.)\s/g, '<br>$1 ');
+        text = text.replace(/•\s/g, '<br>• ');
+        text = text.replace(/-\s/g, '<br>• ');
+        text = text.replace(/(⚠️|🚨|⛔|✅|📞|🚑|🚒|📱)/g, '<strong>$1</strong>');
+        return text;
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function scrollToBottom() {
+        const chatMessages = document.getElementById('chatMessages');
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+    }
+
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage({ preventDefault: () => {} });
+        }
+    });
+</script>
+{% endblock %}

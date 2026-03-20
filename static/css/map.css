@@ -1,0 +1,124 @@
+
+/* Map Specific Styles */
+.map-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.map-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    height: 600px;
+}
+
+.map-canvas {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+}
+
+.map-controls {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow-y: auto;
+}
+
+.control-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.control-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.control-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.map-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.weather-mini-card {
+    background: #f0f9ff;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #bae6fd;
+}
+
+/* Map Popups */
+.map-popup h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.map-popup p {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive Map */
+@media (max-width: 900px) {
+    .map-wrapper {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .map-canvas {
+        height: 500px;
+    }
+    
+    .map-controls {
+        height: auto;
+        max-height: 400px;
+    }
+}

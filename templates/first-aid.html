@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}First Aid & Preparedness - Disaster Alert & Management System{% endblock %}
+
+{% block content %}
+
+<div class="redesign-container">
+    <!-- Header -->
+    <header class="redesign-header">
+        <i class="fas fa-book-medical"></i>
+        <h1>First Aid & Preparedness</h1>
+        <p>Comprehensive guides for handling standard disasters and medical emergencies</p>
+    </header>
+
+    <!-- Grid Layout -->
+    <div class="redesign-grid">
+        <!-- Main Column (Left) -->
+        <main class="redesign-main">
+            <div class="clean-card">
+                <div class="tabs-menu">
+                    <button class="tab-btn active" onclick="switchTab('earthquake')">
+                        <i class="fas fa-wave-square"></i> Earthquake
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('flood')">
+                        <i class="fas fa-water"></i> Flood
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('fire')">
+                        <i class="fas fa-fire"></i> Fire
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('cyclone')">
+                        <i class="fas fa-wind"></i> Cyclone
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('firstaid')">
+                        <i class="fas fa-heart"></i> First Aid
+                    </button>
+                </div>
+
+                <div class="tab-contents" style="margin-top: 2rem;">
+                    <!-- EARTHQUAKE -->
+                    <div id="earthquake" class="tab-content active">
+                        <div class="disaster-guide">
+                            <h2><i class="fas fa-wave-square"></i> Earthquake Safety</h2>
+
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-left"></i> Before</h3>
+                                <div class="checklist">
+                                    <div class="checklist-item">
+                                        <p><strong>Safe Spots:</strong> Identify sturdy tables or interior walls.</p>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <p><strong>Exits:</strong> Know two ways out of every room.</p>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <p><strong>Secure Items:</strong> Bolt heavy furniture to walls.</p>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <p><strong>Emergency Kit:</strong> Prepare food, water, and first aid.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="guide-section">
+                                <h3><i class="fas fa-exclamation-triangle"></i> During</h3>
+                                <p><strong>DROP, COVER, AND HOLD ON.</strong> Stay away from glass and heavy objects. Do
+                                    not use elevators.</p>
+                            </div>
+
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-right"></i> After</h3>
+                                <p>Expect aftershocks. Check for injuries and exit damaged buildings via stairs.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FLOOD -->
+                    <div id="flood" class="tab-content">
+                        <div class="disaster-guide">
+                            <h2><i class="fas fa-water"></i> Flood Safety</h2>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-left"></i> Before</h3>
+                                <p>Identify high ground and prepare a waterproof emergency kit.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-exclamation-triangle"></i> During</h3>
+                                <p>Move to higher ground immediately. Never drive or walk through floodwaters.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-right"></i> After</h3>
+                                <p>Wait for official clearance. Watch for contaminated water and electrical hazards.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIRE -->
+                    <div id="fire" class="tab-content">
+                        <div class="disaster-guide">
+                            <h2><i class="fas fa-fire"></i> Fire Safety</h2>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-left"></i> Before</h3>
+                                <p>Install smoke detectors and practice evacuation routes.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-exclamation-triangle"></i> During</h3>
+                                <p>Alert others. Evacuate immediately via stairs. Crawl under smoke.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-right"></i> After</h3>
+                                <p>Call 101 from a safe location. Do not return inside until cleared.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CYCLONE -->
+                    <div id="cyclone" class="tab-content">
+                        <div class="disaster-guide">
+                            <h2><i class="fas fa-wind"></i> Cyclone Safety</h2>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-left"></i> Before</h3>
+                                <p>Secure outdoor objects and board windows if possible.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-exclamation-triangle"></i> During</h3>
+                                <p>Stay indoors in a small, windowless interior room.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-arrow-right"></i> After</h3>
+                                <p>Beware of fallen power lines and unstable structures.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIRST AID -->
+                    <div id="firstaid" class="tab-content">
+                        <div class="disaster-guide">
+                            <h2><i class="fas fa-heart"></i> First Aid Basics</h2>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-exclamation-circle"></i> Severe Bleeding</h3>
+                                <p>Apply firm, direct pressure with a clean cloth. Elevate if possible.</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-bone"></i> Fractures</h3>
+                                <p>Immobilize the area. Apply ice packs if available (R.I.C.E).</p>
+                            </div>
+                            <div class="guide-section">
+                                <h3><i class="fas fa-heart-pulse"></i> CPR Basics</h3>
+                                <p>Ensure scene safety. Call 102. Push hard and fast in the center of the chest.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar Column (Right) -->
+        <aside class="redesign-sidebar">
+            <div class="clean-card highlight-card">
+                <h3><i class="fas fa-box"></i> Kit Essentials</h3>
+                <div class="sidebar-item-list">
+                    <div class="sidebar-action-btn"><i class="fas fa-tint"></i> Clean Water</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-cookie-bite"></i> Long Life Food</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-first-aid"></i> First Aid Kit</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-flashlight"></i> Flashlight</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-broadcast-tower"></i> Radio</div>
+                </div>
+            </div>
+
+            <div class="clean-card">
+                <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
+                <ul>
+                    <li>Stay calm and follow protocols.</li>
+                    <li>Always keep your battery charged.</li>
+                    <li>Know your local emergency numbers.</li>
+                    <li>Help those with special needs.</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Hide all tabs
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+
+        // Remove active from all buttons
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+
+        // Mark button as active
+        event.currentTarget.classList.add('active');
+    }
+</script>
+{% endblock %}

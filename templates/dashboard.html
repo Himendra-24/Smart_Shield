@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Village Flood Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-redesign.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Village Flood Dashboard</h1>
+        <p>Real-time sensor monitoring from village water stations.</p>
+    </div>
+
+    <!-- WEATHER ALERT BANNER - NEW -->
+    {% if alert.level != "SAFE" %}
+    <div class="alert-banner" style="background: {{ alert.color }}; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; color: white; text-align: center; animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">{{ alert.message }}</h3>
+        {% if alert.reasons %}
+        <p style="margin: 0 0 0.5rem 0;">Reason: {{ alert.reasons | join(', ') }}</p>
+        {% endif %}
+        {% if alert.evacuate or alert.shelter_open %}
+        <a href="/safe-routes" class="btn btn-danger" style="margin-top: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1.1rem; text-decoration: none; display: inline-block; background: white; color: {{ alert.color }}; border-radius: 8px; font-weight: bold;">
+            <i class="fas fa-route"></i> SHOW EVACUATION ROUTES
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Fire Alert Banner -->
+    <div id="fire-banner" class="fire-banner" style="display: none;">
+        <span><i class="fas fa-fire"></i> FIRE DETECTED IN VILLAGE!</span>
+        <div class="flow-container">
+            <span id="buzzer-status" class="buzzer-status">BUZZER: ON</span>
+            <button onclick="acknowledgeAlert()" class="ack-btn">ACKNOWLEDGE</button>
+        </div>
+    </div>
+
+    <!-- Acknowledgement status -->
+    <div id="ack-status" style="display: none; background: #dff9fb; color: #130f40; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; border: 1px solid #7ed6df;">
+        <i class="fas fa-check-circle"></i> Alert Acknowledged
+    </div>
+
+    <div class="stats-grid">
+        <!-- Current Alert -->
+        <div class="dashboard-card shadow-sm">
+            <div class="card-title">Current Alert</div>
+            <div id="alert-level" class="card-value alert-value alert-low">--</div>
+            <div class="card-footnote" id="alert-desc">Scanning conditions...</div>
+        </div>
+
+        <!-- Last Updated -->
+        <div class="dashboard-card shadow-sm">
+            <div class="card-title">Last Updated</div>
+            <div id="last-updated" class="card-value" style="font-size: 1.5rem;">--</div>
+            <div class="card-footnote">Automatic updates every 5s</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <!-- Upstream Sensor -->
+        <div class="dashboard-card shadow-sm">
+            <div class="card-title">Upstream Sensor (S1)</div>
+            <div id="s1-value" class="card-value">--m</div>
+            <div class="card-footnote">Relative water height at Station A</div>
+        </div>
+
+        <!-- Village Sensor -->
+        <div class="dashboard-card shadow-sm">
+            <div class="card-title">Village Sensor (S2)</div>
+            <div id="s2-value" class="card-value">--m</div>
+            <div class="card-footnote">Water level near main bridge</div>
+        </div>
+
+        <!-- Flow Direction -->
+        <div class="dashboard-card shadow-sm">
+            <div class="card-title">Flow Direction</div>
+            <div class="flow-container card-value">
+                <i id="flow-icon" class="fas fa-arrow-down flow-icon" style="display: none;"></i>
+                <span id="flow-text">--</span>
+            </div>
+            <div class="card-footnote">Movement relative to village center</div>
+        </div>
+    </div>
+
+    <!-- Weather Section -->
+    <div class="clean-card" style="margin-top: 2rem;">
+        <h3 class="card-title" style="margin-bottom: 1rem;"><i class="fas fa-cloud-sun"></i> Ongole Weather</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Temperature</span>
+                <div id="weather-temp" style="font-size: 1.2rem; font-weight: bold;">{{ weather.main.temp|round|int }}°C</div>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Humidity</span>
+                <div id="weather-humidity" style="font-size: 1.2rem; font-weight: bold;">{{ weather.main.humidity }}%</div>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Conditions</span>
+                <div id="weather-desc" style="font-size: 1.2rem; font-weight: bold;">{{ weather.weather[0].description|title }}</div>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Alert Level</span>
+                <div id="weather-alert-level" style="font-size: 1.2rem; font-weight: bold; color: {{ alert.color }};">{{ alert.level }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lastFireState = false;
+    let buzzerTimer = null;
+    let dangerAlertShown = false;
+
+    function updateDashboard() {
+        // Fetch System Status
+        fetch('/api/system-status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) return;
+
+                // Update Water Levels
+                document.getElementById('s1-value').textContent = data.s1.toFixed(2) + 'm';
+                document.getElementById('s2-value').textContent = data.s2.toFixed(2) + 'm';
+                document.getElementById('last-updated').textContent = data.timestamp;
+
+                // Update Alert
+                const alertEl = document.getElementById('alert-level');
+                const situation = data.situation || 'SAFE';
+                alertEl.textContent = situation;
+                alertEl.className = 'card-value alert-value alert-' + situation.toLowerCase();
+                
+                // Update Flow
+                const flowText = document.getElementById('flow-text');
+                const flowIcon = document.getElementById('flow-icon');
+                flowText.textContent = data.flow.toUpperCase();
+                
+                if (data.flow === 'Towards Village') {
+                    flowIcon.style.display = 'inline-block';
+                    flowIcon.className = 'fas fa-arrow-down flow-icon flow-towards';
+                    flowText.className = 'flow-towards';
+                } else if (data.flow === 'Local Water') {
+                    flowIcon.style.display = 'inline-block';
+                    flowIcon.className = 'fas fa-arrow-up flow-icon flow-local';
+                    flowText.className = 'flow-local';
+                } else if (data.flow === 'Safe' || data.flow === 'Stable') {
+                    flowIcon.style.display = 'none';
+                    flowText.className = 'flow-safe';
+                } else {
+                    flowIcon.style.display = 'none';
+                    flowText.className = '';
+                }
+
+                // Fire Detection
+                const fireBanner = document.getElementById('fire-banner');
+                if (data.fire) {
+                    fireBanner.style.display = 'flex';
+                    if (!lastFireState) {
+                        triggerBuzzer();
+                    }
+                } else {
+                    fireBanner.style.display = 'none';
+                }
+                lastFireState = data.fire;
+
+                // Acknowledgement status
+                const ackStatus = document.getElementById('ack-status');
+                if (data.acknowledged) {
+                    ackStatus.style.display = 'block';
+                    stopBuzzer();
+                } else {
+                    ackStatus.style.display = 'none';
+                }
+
+                // DANGER POPUP - NEW
+                if (data.situation === "DANGER" && !dangerAlertShown) {
+                    dangerAlertShown = true;
+                    if (confirm("🚨 FLOOD DANGER DETECTED! Water levels are critical. View evacuation routes immediately?")) {
+                        window.location.href = "/safe-routes";
+                    }
+                }
+            })
+            .catch(err => console.error("System Update failed:", err));
+
+        // Fetch Weather Status
+        fetch('/api/weather')
+            .then(res => res.json())
+            .then(data => {
+                if (data.main) {
+                    document.getElementById('weather-temp').textContent = Math.round(data.main.temp) + '°C';
+                    document.getElementById('weather-humidity').textContent = data.main.humidity + '%';
+                    if (data.weather && data.weather[0]) {
+                        document.getElementById('weather-desc').textContent = data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1);
+                    }
+                }
+            })
+            .catch(err => console.error("Weather Update failed:", err));
+    }
+
+    function triggerBuzzer() {
+        const buzzerStatus = document.getElementById('buzzer-status');
+        buzzerStatus.textContent = 'BUZZER: ON';
+        buzzerStatus.style.background = 'rgba(255,255,255,0.4)';
+        
+        if (buzzerTimer) clearTimeout(buzzerTimer);
+        buzzerTimer = setTimeout(stopBuzzer, 5000);
+    }
+
+    function stopBuzzer() {
+        const buzzerStatus = document.getElementById('buzzer-status');
+        buzzerStatus.textContent = 'BUZZER: OFF';
+        buzzerStatus.style.background = 'rgba(0,0,0,0.2)';
+    }
+
+    function acknowledgeAlert() {
+        alert("Alert Acknowledged. Waiting for hardware update...");
+    }
+
+    // Initial load and periodic polling
+    document.addEventListener('DOMContentLoaded', () => {
+        updateDashboard();
+        setInterval(updateDashboard, 5000);
+    });
+</script>
+{% endblock %}

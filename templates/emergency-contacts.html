@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Emergency Contacts - Disaster Alert & Management System{% endblock %}
+
+{% block content %}
+<div class="redesign-container">
+    <!-- Header -->
+    <header class="redesign-header">
+        <i class="fas fa-phone-volume"></i>
+        <h1>Emergency Contacts</h1>
+        <p>Quick access to emergency services and helpline numbers</p>
+    </header>
+
+    <!-- Grid Layout -->
+    <div class="redesign-grid">
+        <!-- Main Column (Left) -->
+        <main class="redesign-main">
+            <!-- National Hotlines (Cards) -->
+            <section class="clean-card">
+                <h2><i class="fas fa-globe"></i> National Hotlines</h2>
+                <div class="hotlines-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="hotline-card critical"
+                        style="text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: #fff5f5;">
+                        <h3 style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.5rem;">100</h3>
+                        <p style="font-weight: bold; margin: 0;">Police</p>
+                    </div>
+                    <div class="hotline-card critical"
+                        style="text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: #fff5f5;">
+                        <h3 style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.5rem;">102</h3>
+                        <p style="font-weight: bold; margin: 0;">Ambulance</p>
+                    </div>
+                    <div class="hotline-card critical"
+                        style="text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: #fff5f5;">
+                        <h3 style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.5rem;">101</h3>
+                        <p style="font-weight: bold; margin: 0;">Fire</p>
+                    </div>
+                    <div class="hotline-card info"
+                        style="text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: #f0f7ff;">
+                        <h3 style="font-size: 1.5rem; color: var(--info); margin-bottom: 0.5rem;">108</h3>
+                        <p style="font-weight: bold; margin: 0;">Unified</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Campus Contacts (Table) -->
+            <section class="clean-card">
+                <h2><i class="fas fa-university"></i> Campus Contacts</h2>
+                <div class="contacts-table-wrapper" style="margin-top: 1rem; overflow-x: auto;">
+                    <table class="contacts-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th style="padding: 1rem;">Service</th>
+                                <th style="padding: 1rem;">Phone</th>
+                                <th style="padding: 1rem;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 1rem;"><strong>{{ contact.name }}</strong><br><small
+                                        style="color: var(--text-secondary)">{{ contact.category }}</small></td>
+                                <td style="padding: 1rem;">{{ contact.phone }}</td>
+                                <td style="padding: 1rem;">
+                                    <button class="btn btn-sm btn-primary"
+                                        onclick="callNumber('{{ contact.phone }}')">Call</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Sidebar Column (Right) -->
+        <aside class="redesign-sidebar">
+            <!-- SOS Alert -->
+            <div class="clean-card highlight-card" style="text-align: center;">
+                <h3><i class="fas fa-exclamation-triangle"></i> Need Immediate Help?</h3>
+                <p style="margin-bottom: 1.5rem;">Trigger a campus-wide SOS alert with your location coordinates.</p>
+                <button onclick="triggerSOSModal()" class="btn btn-danger btn-block btn-lg" style="width: 100%;">
+                    <i class="fas fa-phone-alt"></i> Send SOS Alert
+                </button>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="clean-card">
+                <h3><i class="fas fa-lightbulb"></i> Emergency Tips</h3>
+                <div class="sidebar-item-list">
+                    <div class="sidebar-action-btn"><i class="fas fa-check-circle"></i> Stay Calm</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-map-pin"></i> Know Your Location</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-volume-up"></i> Speak Clearly</div>
+                    <div class="sidebar-action-btn"><i class="fas fa-user-shield"></i> Follow Instructions</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- SOS Modal -->
+<div id="sosModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-phone-alt"></i> Send SOS Alert</h2>
+            <button onclick="closeSOS()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="sosForm" class="modal-form">
+            <div class="form-group">
+                <label for="sosName">Your Name *</label>
+                <input type="text" id="sosName" name="name" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="sosPhone">Phone Number *</label>
+                <input type="tel" id="sosPhone" name="phone" required placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="sosDesc">Emergency Description *</label>
+                <textarea id="sosDesc" name="description" required
+                    placeholder="Describe your emergency (e.g., 'Earthquake at campus library, person injured')"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="shareLocation" checked>
+                    <strong>Share My Location</strong> with emergency responders (recommended)
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger btn-block">
+                    <i class="fas fa-phone-alt"></i> Send SOS Alert
+                </button>
+                <button type="button" class="btn btn-secondary btn-block" onclick="closeSOS()">
+                    Cancel
+                </button>
+            </div>
+
+            <p class="form-note">
+                <i class="fas fa-info-circle"></i>
+                <strong>Important:</strong> For life-threatening emergencies, call 100/102/101 directly instead of using
+                this system.
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+    function triggerSOSModal() {
+        document.getElementById('sosModal').classList.remove('hidden');
+    }
+
+    function closeSOS() {
+        document.getElementById('sosModal').classList.add('hidden');
+    }
+
+    function callNumber(phone) {
+        // Check if device supports tel: protocol
+        if (navigator.userAgent.match(/Android|iPhone|iPad/i)) {
+            window.location.href = 'tel:' + phone;
+        } else {
+            // For desktop, show alert
+            alert(`Please call: ${phone}`);
+        }
+    }
+
+    document.getElementById('sosForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const sosData = {
+            name: document.getElementById('sosName').value,
+            phone: document.getElementById('sosPhone').value,
+            description: document.getElementById('sosDesc').value,
+            latitude: 0,
+            longitude: 0
+        };
+
+        if (document.getElementById('shareLocation').checked) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                sosData.latitude = position.coords.latitude;
+                sosData.longitude = position.coords.longitude;
+                sendSOSRequest(sosData);
+            }, function (error) {
+                console.log('Geolocation error:', error);
+                sendSOSRequest(sosData);
+            });
+        } else {
+            sendSOSRequest(sosData);
+        }
+    });
+
+    function sendSOSRequest(data) {
+        fetch('/api/sos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                showAlert('SOS Alert Sent!', result.message + ' Your location and details have been shared with emergency services.', 'success');
+                closeSOS();
+                document.getElementById('sosForm').reset();
+            })
+            .catch(err => {
+                showAlert('Error Sending SOS', 'Could not send SOS. Please call emergency services directly: 100/102/101', 'danger');
+                console.error('SOS Error:', err);
+            });
+    }
+
+    window.onclick = function (event) {
+        const modal = document.getElementById('sosModal');
+        if (event.target === modal) {
+            closeSOS();
+        }
+    }
+</script>
+{% endblock %}

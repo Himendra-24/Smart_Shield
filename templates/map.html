@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Village Flood Map{% endblock %}
+
+{% block content %}
+<div class="map-container">
+    <div class="page-header">
+        <h1><i class="fas fa-map"></i> Village Flood Map</h1>
+        <p>Monitoring river levels and village safety zones.</p>
+    </div>
+
+    <div class="map-wrapper">
+        <div id="map" class="map-canvas"></div>
+
+        <div class="map-controls">
+            <div class="control-panel">
+
+                <!-- LEGEND -->
+                <div class="control-section">
+                    <h3><i class="fas fa-layer-group"></i> Legend</h3>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background:#e67e22;"></span>
+                            <span>River / Dam (Upstream)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background:#3498db;"></span>
+                            <span>Village Center</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background:#27ae60;"></span>
+                            <span>Safe Shelter (Chimakurthy)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="control-section">
+                    <h3><i class="fas fa-info-circle"></i> System Status</h3>
+                    <p id="mapStatus">Loading sensor data...</p>
+
+                    <div id="flow-display" style="margin-top:10px;display:none;">
+                        <strong>Flow:</strong> <span id="flow-text">--</span>
+                        <div style="font-size:2rem;text-align:center;margin-top:5px;">
+                            <i id="flow-arrow" class="fas fa-arrow-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ROUTING PLUGIN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<script>
+    /* ---------------- GLOBALS ---------------- */
+    let map;
+    let evacuationRoute = null;
+    let userLocation = null;
+
+    /* LOCATIONS */
+    const VILLAGE_POS = [15.5057, 80.0493];
+    const RIVER_POS = [15.5157, 80.0550];
+
+    /* CHIMAKURTHY SAFE ZONE */
+    const SAFE_ZONES = [
+        {
+            name: "Chimakurthy (Inland Safe Zone)",
+            coords: [15.5813, 79.8596]
+        },
+        {
+            name: "Ongole Collectorate",
+            coords: [15.4988, 80.0497]
+        },
+        {
+            name: "Railway Station High Area",
+            coords: [15.5069, 80.0544]
+        },
+        {
+            name: "Government Hospital Area",
+            coords: [15.5051, 80.0472]
+        }
+    ];
+
+    /* ---------------- INIT ---------------- */
+    document.addEventListener("DOMContentLoaded", () => {
+        initMap();
+        updateMapData();
+        setInterval(updateMapData, 5000);
+    });
+
+    /* ---------------- MAP ---------------- */
+    function initMap() {
+        // Initialize map FIRST
+        map = L.map("map").setView(VILLAGE_POS, 13);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        // Static markers
+        L.marker(VILLAGE_POS, { icon: icon("blue") })
+            .addTo(map).bindPopup("Village Center");
+
+        L.marker(RIVER_POS, { icon: icon("orange") })
+            .addTo(map).bindPopup("River / Dam Station");
+
+        // Add safe zone markers
+        SAFE_ZONES.forEach(zone => {
+            L.marker(zone.coords, { icon: icon("green") })
+                .addTo(map)
+                .bindPopup(`
+                <strong>${zone.name}</strong><br>
+                <button onclick="routeTo(${zone.coords[0]}, ${zone.coords[1]})">
+                    🚶 Evacuate Here
+                </button>
+            `);
+        });
+
+        /* ---- USER GPS ---- */
+        map.locate({ enableHighAccuracy: true });
+
+        map.on("locationfound", e => {
+            userLocation = [e.latitude, e.longitude];
+
+            L.marker(userLocation, { icon: icon("blue") })
+                .addTo(map)
+                .bindPopup("Your Location")
+                .openPopup();
+        });
+
+        map.on("locationerror", () => {
+            console.warn("GPS denied, using village center");
+            userLocation = VILLAGE_POS;
+        });
+    }
+
+    /* ---------------- ICON ---------------- */
+    function icon(color) {
+        return L.icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-${color}.png`,
+            shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41]
+        });
+    }
+
+    /* ---------------- DATA ---------------- */
+    function updateMapData() {
+        fetch("/api/system-status")
+            .then(r => r.json())
+            .then(data => {
+
+                const status = document.getElementById("mapStatus");
+                status.innerHTML =
+                    `Alert: <strong>${data.situation}</strong><br>
+                 Last Updated: ${data.timestamp}`;
+
+                const flowBox = document.getElementById("flow-display");
+                const flowText = document.getElementById("flow-text");
+                const arrow = document.getElementById("flow-arrow");
+
+                flowBox.style.display = "block";
+                flowText.textContent = data.flow;
+
+                if (data.flow === "TOWARDS") {
+                    arrow.className = "fas fa-arrow-down";
+                    arrow.style.color = "red";
+                } else {
+                    arrow.className = "fas fa-check-circle";
+                    arrow.style.color = "green";
+                }
+
+                /* -------- EVACUATION -------- */
+                if (data.situation === "WARNING" || data.situation === "DANGER") {
+
+                    status.innerHTML +=
+                        `<br><span style="color:red;font-weight:bold;">
+                     ⚠ EVACUATE IMMEDIATELY
+                     </span>`;
+
+                    drawRoute();
+                } else {
+                    clearRoute();
+                }
+            });
+    }
+
+    /* ---------------- ROUTING ---------------- */
+    function routeTo(lat, lng) {
+        clearRoute();
+
+        evacuationRoute = L.Routing.control({
+            waypoints: [
+                L.latLng(userLocation[0], userLocation[1]),
+                L.latLng(lat, lng)
+            ],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            show: false,
+            lineOptions: {
+                styles: [{ color: "red", weight: 5 }]
+            },
+            createMarker: () => null
+        }).addTo(map);
+    }
+    function drawRoute() {
+        if (evacuationRoute || !userLocation) return;
+
+        // Use first safe zone (Chimakurthy) as default evacuation point
+        const shelter = SAFE_ZONES[0].coords;
+
+        evacuationRoute = L.Routing.control({
+            waypoints: [
+                L.latLng(userLocation[0], userLocation[1]),
+                L.latLng(shelter[0], shelter[1])
+            ],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            show: false,
+            lineOptions: { styles: [{ color: "red", weight: 5 }] },
+            createMarker: () => null
+        }).addTo(map);
+    }
+
+    function clearRoute() {
+        if (evacuationRoute) {
+            map.removeControl(evacuationRoute);
+            evacuationRoute = null;
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Disaster Alert & Management System{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <span class="fade-in"> Real-Time Flood Alert & Evacuation </span>
+            <span class="fade-in" style="animation-delay: 0.2s;"> Management</span>
+            <span class="fade-in" style="animation-delay: 0.4s;">System</span>
+        </h1>
+        <p class="hero-subtitle fade-in" style="animation-delay: 0.6s;">
+            Real-time monitoring, instant alerts, and emergency response coordination
+        </p>
+        <div class="hero-buttons fade-in" style="animation-delay: 0.8s;">
+            <a href="/dashboard" class="btn btn-primary">
+                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+            </a>
+            <a href="/map" class="btn btn-secondary">
+                <i class="fas fa-map"></i> View Map
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <div class="floating-card card-1">
+            <i class="fas fa-bell"></i>
+            <p>Real-time Alerts</p>
+        </div>
+        <div class="floating-card card-2">
+            <i class="fas fa-map-location-dot"></i>
+            <p>Live Tracking</p>
+        </div>
+        <div class="floating-card card-3">
+            <i class="fas fa-robot"></i>
+            <p>AI Assistant</p>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="redesign-container">
+    <div class="redesign-grid">
+        <!-- Main Column (Left) -->
+        <main class="redesign-main">
+            <!-- Current Village Status -->
+            <section class="clean-card">
+                <h2><i class="fas fa-satellite-dish"></i> Village Status</h2>
+                <div class="status-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="status-item"
+                        style="text-align: center; padding: 1.5rem; background: var(--light-bg); border-radius: 12px;">
+                        <i class="fas fa-cloud-rain"
+                            style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                        <div class="status-value" id="weather-temp" style="font-size: 1.8rem; font-weight: bold;">--°C
+                        </div>
+                        <p id="weather-desc" style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Loading...
+                        </p>
+                    </div>
+                    <div class="status-item"
+                        style="text-align: center; padding: 1.5rem; background: var(--light-bg); border-radius: 12px;">
+                        <i class="fas fa-exclamation-triangle"
+                            style="font-size: 1.5rem; color: var(--warning); margin-bottom: 0.5rem;"></i>
+                        <div class="status-value" id="alert-count" style="font-size: 1.8rem; font-weight: bold;">0</div>
+                        <p id="alert-status" style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Active
+                            Alerts</p>
+                    </div>
+                    <div class="status-item"
+                        style="text-align: center; padding: 1.5rem; background: var(--light-bg); border-radius: 12px;">
+                        <i class="fas fa-shield-heart"
+                            style="font-size: 1.5rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                        <div class="status-value" id="safe-zone-count" style="font-size: 1.8rem; font-weight: bold;">3
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Safe Zones</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Grid -->
+            <section class="clean-card">
+                <h2><i class="fas fa-star"></i> Key Modules</h2>
+                <div class="features-mini-grid"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="mini-feature">
+                        <h3><i class="fas fa-map-marked-alt"></i> Risk Map</h3>
+                        <p>Live village monitoring with color-coded safety zones.</p>
+                    </div>
+                    <div class="mini-feature">
+                        <h3><i class="fas fa-robot"></i> AI Assistant</h3>
+                        <p>24/7 disaster guidance and emergency first aid help.</p>
+                    </div>
+                    <div class="mini-feature">
+                        <h3><i class="fas fa-phone-volume"></i> Emergency</h3>
+                        <p>Quick access to village authorities and national helplines.</p>
+                    </div>
+                    <div class="mini-feature">
+                        <h3><i class="fas fa-book-medical"></i> First Aid</h3>
+                        <p>Step-by-step protocols for handling critical injuries.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How it works -->
+            <section class="clean-card">
+                <h3><i class="fas fa-lightbulb"></i> How VillageFloodAlert Works</h3>
+                <p>The system integrates real-time weather and sensor data from village water stations to
+                    provide a comprehensive safety net for all residents.</p>
+                <ul style="margin-top: 1rem; columns: 2; column-gap: 2rem;">
+                    <li><i class="fas fa-check-circle" style="color: var(--success);"></i> Live API Integration</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--success);"></i> Automatic SOS Routing</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--success);"></i> Predictive Risk Analysis</li>
+                    <li><i class="fas fa-check-circle" style="color: var(--success);"></i> 24/7 Availability</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- Sidebar Column (Right) -->
+        <aside class="redesign-sidebar">
+            <div class="clean-card highlight-card">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="sidebar-item-list">
+                    <button onclick="triggerSOSModal()" class="btn btn-danger btn-block"
+                        style="width: 100%; margin-bottom: 1rem; border-radius: 12px; padding: 1rem;">
+                        <i class="fas fa-exclamation-circle"></i> Send SOS
+                    </button>
+                    <a href="/dashboard" class="sidebar-action-btn"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/chat" class="sidebar-action-btn"><i class="fas fa-robot"></i> AI Assistant</a>
+                    <a href="/map" class="sidebar-action-btn"><i class="fas fa-map"></i> View Map</a>
+                    <a href="/emergency-contacts" class="sidebar-action-btn"><i class="fas fa-phone-alt"></i> Contact
+                        Center</a>
+                </div>
+            </div>
+
+            <div class="clean-card">
+                <h3><i class="fas fa-info-circle"></i> Status Info</h3>
+                <p style="font-size: 0.9rem; line-height: 1.6;">
+                    The system is currently operational. All sensors are reporting normal levels across the village
+                    perimeter.
+                </p>
+                <div
+                    style="margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; border-left: 4px solid var(--primary);">
+                    <p style="margin: 0; font-size: 0.85rem; color: #1565c0;">
+                        <strong>Tip:</strong> Keep your profile updated for better emergency coordination.
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+
+<!-- SOS Modal -->
+<div id="sosModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-phone-alt"></i> Send SOS Alert</h2>
+            <button onclick="closeSOS()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="sosForm" class="modal-form">
+            <div class="form-group">
+                <label for="sosName">Your Name</label>
+                <input type="text" id="sosName" name="name" required placeholder="Enter your name">
+            </div>
+
+            <div class="form-group">
+                <label for="sosPhone">Phone Number</label>
+                <input type="tel" id="sosPhone" name="phone" required placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="sosDesc">Emergency Description</label>
+                <textarea id="sosDesc" name="description" required placeholder="Describe your emergency"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="shareLocation" checked>
+                    Share my location with emergency responders
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-phone-alt"></i> Send SOS
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Load current status
+    document.addEventListener('DOMContentLoaded', function () {
+        loadWeatherStatus();
+        loadAlertStatus();
+
+        // Fetch weather updates every 5 minutes
+        setInterval(loadWeatherStatus, 300000);
+    });
+
+    function loadWeatherStatus() {
+        fetch('/api/weather')
+            .then(response => response.json())
+            .then(data => {
+                if (data.main) {
+                    document.getElementById('weather-temp').textContent = Math.round(data.main.temp) + '°C';
+                    if (data.weather && data.weather[0]) {
+                        document.getElementById('weather-desc').textContent = data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1);
+                    }
+                }
+            })
+            .catch(err => console.log('Weather API may be unavailable:', err));
+    }
+
+    function loadAlertStatus() {
+        fetch('/api/system-status')
+            .then(response => response.json())
+            .then(data => {
+                // In the new backend, situation is what we care about
+                if (data.situation !== 'SAFE') {
+                    document.getElementById('alert-count').textContent = '1';
+                    document.getElementById('alert-status').textContent = 'Active Alert: ' + data.situation;
+                } else {
+                    document.getElementById('alert-count').textContent = '0';
+                    document.getElementById('alert-status').textContent = 'No active alerts';
+                }
+            })
+            .catch(err => console.log('System status fetch error:', err));
+    }
+
+    function triggerSOSModal() {
+        document.getElementById('sosModal').classList.remove('hidden');
+    }
+
+    function closeSOS() {
+        document.getElementById('sosModal').classList.add('hidden');
+    }
+
+    document.getElementById('sosForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const sosData = {
+            name: document.getElementById('sosName').value,
+            phone: document.getElementById('sosPhone').value,
+            description: document.getElementById('sosDesc').value,
+            latitude: 0,
+            longitude: 0
+        };
+
+        if (document.getElementById('shareLocation').checked) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                sosData.latitude = position.coords.latitude;
+                sosData.longitude = position.coords.longitude;
+                sendSOSRequest(sosData);
+            }, function () {
+                sendSOSRequest(sosData);
+            });
+        } else {
+            sendSOSRequest(sosData);
+        }
+    });
+
+    function sendSOSRequest(data) {
+        fetch('/api/sos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                showAlert('SOS Sent Successfully', result.message, 'success');
+                closeSOS();
+                document.getElementById('sosForm').reset();
+            })
+            .catch(err => {
+                showAlert('Error Sending SOS', 'Please try again or call emergency services directly.', 'danger');
+            });
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('sosModal');
+        if (event.target === modal) {
+            closeSOS();
+        }
+    }
+</script>
+{% endblock %}
