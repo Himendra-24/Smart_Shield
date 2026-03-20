@@ -137,12 +137,13 @@ python app.py
 ---
 
 ## 📸 Screenshots
+<img width="1895" height="875" alt="image" src="https://github.com/user-attachments/assets/002f0a73-54a1-4046-8dbc-ea2f5289794a" />
 
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
+<img width="1883" height="870" alt="image-1" src="https://github.com/user-attachments/assets/d2129a2a-7839-490c-b6a7-78fd9963e3cc" />
 
-![alt text](image-3.png)
+<img width="1895" height="875" alt="image" src="https://github.com/user-attachments/assets/d3fbc2e3-01e9-4f95-8a62-b29f37b71db6" />
+
+<img width="1883" height="870" alt="image-1" src="https://github.com/user-attachments/assets/6c213879-ed97-44bd-8b89-37eb28d575b1" />
 
 ---
 
@@ -157,7 +158,7 @@ python app.py
 
 ## 👨‍💻 Author
 
-**Sai Pakala**
+**Venkata Sai Hemendra**
 
 ---
 
