@@ -4,3 +4,11 @@ Flask-CORS==4.0.0
 python-dotenv==1.0.0
 requests==2.31.0
 groq==1.0.0
+flask
+flask-cors
+pandas
+requests
+python-dotenv
+groq
+openpyxl
+gunicorn
